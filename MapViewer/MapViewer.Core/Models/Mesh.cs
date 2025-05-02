@@ -1,38 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MapViewer.Core.Models
 {
     /// <summary>
-    /// Instantiate model for MeshGeometry3D representation of a map.
+    /// Model for a MeshGeometry3D view.
     /// </summary>
     /// <param name="positions">Vertex positions for MeshGeometry3D.</param>
     /// <param name="normals">Vertex normals for MeshGeometry3D.</param>
     /// <param name="textureCoordinates">Vertex texture coordinates for MeshGeometry3D.</param>
     /// <param name="triangleIndices">Triangle indices for MeshGeometry3D.</param>
-    public class MapMesh (string positions, string normals, string textureCoordinates, string triangleIndices)
+    public class Mesh (IEnumerable<Vector3> positions, IEnumerable<Vector3> normals, IEnumerable<Vector2> textureCoordinates, IEnumerable<int> triangleIndices)
     {
         /// <summary>
         /// Vertex positions for MeshGeometry3D.
         /// </summary>
-        public string Positions { get; } = positions;
+        public IEnumerable<Vector3> Positions { get; } = positions;
 
         /// <summary>
         /// Vertex normals for MeshGeometry3D.
         /// </summary>
-        public string Normals { get; } = normals;
+        public IEnumerable<Vector3> Normals { get; } = normals;
 
         /// <summary>
         /// Vertex texture coordinates for MeshGeometry3D.
         /// </summary>
-        public string TextureCoordinates { get; } = textureCoordinates;
+        public IEnumerable<Vector2> TextureCoordinates { get; } = textureCoordinates;
 
         /// <summary>
         /// Triangle indices for MeshGeometry3D.
         /// </summary>
-        public string TriangleIndices { get; } = triangleIndices;
+        public IEnumerable<int> TriangleIndices { get; } = triangleIndices;
     }
 }

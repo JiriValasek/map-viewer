@@ -29,6 +29,5 @@ namespace MapViewer.Core.Exceptions
             OffendingLine = offendingLine;
         }
 
-
     }
 }

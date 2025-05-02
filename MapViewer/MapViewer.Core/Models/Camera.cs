@@ -8,24 +8,38 @@ using System.Threading.Tasks;
 namespace MapViewer.Core.Models
 {
     /// <summary>
-    /// Instantiate model for an OrthographicCamera.
+    /// Model for an OrthographicCamera with default LookDirection (-z) and UpDirection (y).
     /// </summary>
     /// <param name="width">Camera's width in the world's coordinate system.</param>
-    /// <param name="positionX">X coordinate for initial position.</param>
-    /// <param name="positionY">Y coordinate for initial position.</param>
-    /// <param name="positionZ">Z coordinate for initial position.</param>
+    /// <param name="positionX">X coordinate for camera position.</param>
+    /// <param name="positionY">Y coordinate for camera position.</param>
+    /// <param name="positionZ">Z coordinate for camera position.</param>
     public class Camera(double width, float positionX, float positionY, float positionZ)
     {
-        private Vector3 _position = new Vector3(positionX, positionY, positionZ);
-        private Vector3 _lookDirection = new Vector3(0, 0, -1);
-        private Vector3 _upDirection = new Vector3(0, 1, 0);
+        private readonly Vector3 _position = new(positionX, positionY, positionZ);
+        private readonly Vector3 _lookDirection = new(0, 0, -1);
+        private readonly Vector3 _upDirection = new(0, 1, 0);
+
+        /// <summary>
+        /// Model for an OrthographicCamera with a custom LookDirection and UpDirection.
+        /// </summary>
+        /// <param name="position">Camera's position.</param>
+        /// <param name="lookDirection">Camera's lens direction</param>
+        /// <param name="upDirection">Camera's up dircetion, should be perpendicular to the <paramref name="lookDirection"/>.</param>
+        /// <param name="width">Width of the camera.</param>
+        public Camera(Vector3 position, Vector3 lookDirection, Vector3 upDirection, double width) :
+            this(width, position.X, position.Y, position.Z)
+        {
+            _lookDirection = lookDirection;
+            _upDirection = upDirection;
+        }
 
         /// <summary>
         /// Camera's position.
         /// </summary>
         public Vector3 Position 
         {
-            get => Vector3.Transform(_position, Transform);
+            get => _position;
         }
 
         /// <summary>
@@ -33,7 +47,7 @@ namespace MapViewer.Core.Models
         /// </summary>
         public Vector3 LookDirection
         {
-            get => Vector3.Transform(_lookDirection, Transform);
+            get => _lookDirection;
         }
 
         /// <summary>
@@ -41,13 +55,8 @@ namespace MapViewer.Core.Models
         /// </summary>
         public Vector3 UpDirection
         {
-            get => Vector3.Transform(_upDirection, Transform);
+            get => _upDirection;
         }
-
-        /// <summary>
-        /// Current cameras's transformation.
-        /// </summary>
-        public Matrix4x4 Transform { get; }
 
         /// <summary>
         /// Camera's width in the world's coordinate system.

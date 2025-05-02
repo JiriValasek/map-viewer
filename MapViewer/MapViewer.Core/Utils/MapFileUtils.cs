@@ -2,6 +2,7 @@
 using MapViewer.Core.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -15,52 +16,54 @@ namespace MapViewer.Core.Utils
     /// </summary>
     public static class MapFileUtils
     {
-        private static readonly Regex COLUMN_COUNT_REGEX = new Regex("ncols\\s+(?<value>\\d+)", RegexOptions.IgnoreCase);
-        private static readonly Regex ROW_COUNT_REGEX = new Regex("nrows\\s+(?<value>\\d+)", RegexOptions.IgnoreCase);
-        private static readonly Regex X_LL_CORNER_REGEX = new Regex("xllcorner\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.IgnoreCase);
-        private static readonly Regex Y_LL_CORNER_REGEX = new Regex("yllcorner\\s+(?<value>\\d+)", RegexOptions.IgnoreCase);
-        private static readonly Regex CELL_SIZE_REGEX = new Regex("cellsize\\s+(?<value>\\d+)", RegexOptions.IgnoreCase);
-        private static readonly Regex ALTITUDE_REGEX = new Regex("\\s*((?<value>\\d+)\\s*)*", RegexOptions.ExplicitCapture);
+        private static readonly Regex COLUMN_COUNT_REGEX = new("ncols\\s+(?<value>\\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex ROW_COUNT_REGEX = new("nrows\\s+(?<value>\\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex X_LL_CORNER_REGEX = new("xllcorner\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex Y_LL_CORNER_REGEX = new("yllcorner\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex CELL_SIZE_REGEX = new("cellsize\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex ALTITUDE_REGEX = new("\\s*((?<value>\\d+)\\s*)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         /// <summary>
         /// Parse ESRI like map files based on format from the assignment.
         /// </summary>
         /// <param name="filepath">Path of the map file.</param>
         /// <returns>Map data model.</returns>
-        /// <exception cref="MapFileException">Thrown when map file does not conform to the prescribed format.</exception>
-        public static MapData LoadMap(string filepath)
+        /// <exception cref="MapFileException">
+        /// Thrown when <paramref name="filepath">map file</paramref> does not conform to the prescribed format.
+        /// </exception>
+        public static async Task<MapData> LoadMapAsync(string filepath)
         {
-            int altitudeLineN, altitudeColumnN;
+            int altitudeLineN = 0, altitudeColumnN;
             try
             {
                 using StreamReader reader = new(filepath, Encoding.ASCII);
 
                 // parse column count
-                string line = reader.ReadLine() ?? "";
+                string line = await reader.ReadLineAsync() ?? "";
                 Match match = COLUMN_COUNT_REGEX.Match(line);
                 if (!match.Success)
                 {
                     throw new MapFileException(String.Format("Column count parsing failed, it should match {0}.",COLUMN_COUNT_REGEX), 1);
                 }
-                if (! UInt32.TryParse(match.Groups["value"].Value, out UInt32 columnCount))
+                if (! Int32.TryParse(match.Groups["value"].Value, out Int32 columnCount))
                 {
                     throw new MapFileException("Unable to parse column count as a 32-bit integer.", 1);
                 }
 
                 // parse row count
-                line = reader.ReadLine() ?? "";
+                line = await reader.ReadLineAsync() ?? "";
                 match = ROW_COUNT_REGEX.Match(line);
                 if (!match.Success)
                 {
                     throw new MapFileException(String.Format("Row count parsing failed, it should match {0}.", ROW_COUNT_REGEX), 2);
                 }
-                if (!UInt32.TryParse(match.Groups["value"].Value, out UInt32 rowCount))
+                if (!Int32.TryParse(match.Groups["value"].Value, out Int32 rowCount))
                 {
                     throw new MapFileException("Unable to parse row count as a 32-bit integer.", 2);
                 }
 
                 // parse xllcorner
-                line = reader.ReadLine() ?? "";
+                line = await reader.ReadLineAsync() ?? "";
                 match = X_LL_CORNER_REGEX.Match(line);
                 if (!match.Success)
                 {
@@ -72,7 +75,7 @@ namespace MapViewer.Core.Utils
                 }
 
                 // parse yllcorner
-                line = reader.ReadLine() ?? "";
+                line = await reader.ReadLineAsync() ?? "";
                 match = Y_LL_CORNER_REGEX.Match(line);
                 if (!match.Success)
                 {
@@ -84,7 +87,7 @@ namespace MapViewer.Core.Utils
                 }
 
                 // parse cellSize
-                line = reader.ReadLine() ?? "";
+                line = await reader.ReadLineAsync() ?? "";
                 match = CELL_SIZE_REGEX.Match(line);
                 if (!match.Success)
                 {
@@ -96,22 +99,38 @@ namespace MapViewer.Core.Utils
                 }
 
                 // parse altitude
-                UInt32[,] altitude = new UInt32[rowCount, columnCount];
-                for (altitudeLineN = 0; altitudeLineN < rowCount; altitudeLineN++)
+                Int32[,] altitude = new Int32[rowCount, columnCount];
+                try
                 {
-                    line = reader.ReadLine() ?? "";
-                    match = ALTITUDE_REGEX.Match(line);
-                    if (!match.Success)
+                    for (altitudeLineN = 0; altitudeLineN < rowCount; altitudeLineN++)
                     {
-                        throw new MapFileException(String.Format("Altitude row parsing failed, it should match {0}.", ALTITUDE_REGEX), 6 + altitudeLineN);
-                    }
-                    for (altitudeColumnN = 0; altitudeColumnN < columnCount; altitudeColumnN++)
-                    {
-                        if (!UInt32.TryParse(match.Groups["value"].Captures[altitudeColumnN].Value, out altitude[altitudeLineN, altitudeColumnN]))
+                        line = await reader.ReadLineAsync() ?? "";
+                        match = ALTITUDE_REGEX.Match(line);
+                        if (!match.Success)
                         {
-                            throw new MapFileException(String.Format("Unable to parse altitude value number {0} a 32-bit integer.", altitudeColumnN), 5);
+                            throw new MapFileException(String.Format("Altitude row parsing failed, it should match {0}.", ALTITUDE_REGEX), 6 + altitudeLineN);
+                        }
+                        try
+                        {
+                            for (altitudeColumnN = 0; altitudeColumnN < columnCount; altitudeColumnN++)
+                            {
+                                if (!Int32.TryParse(match.Groups["value"].Captures[altitudeColumnN].Value, out altitude[altitudeLineN, altitudeColumnN]))
+                                {
+                                    throw new MapFileException(String.Format("Unable to parse altitude value number {0} a 32-bit integer.", altitudeColumnN), 6 + altitudeLineN);
+                                }
+                            }
+                        }
+                        catch (ArgumentOutOfRangeException e)
+                        {
+                            throw new MapFileException(String.Format("Missing altitude columns."), e, 6 + altitudeLineN);
+
                         }
                     }
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    throw new MapFileException(String.Format("Missing altitude rows."), e, 6 + altitudeLineN);
+
                 }
 
                 return new MapData(filepath, columnCount, rowCount, xLLCorner, yLLCorner, cellSize, altitude);
@@ -119,14 +138,16 @@ namespace MapViewer.Core.Utils
             }
             catch (IOException e)
             {
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
+                // TODO Put logging here
+                Debug.WriteLine("The file could not be read:");
+                Debug.WriteLine(e.Message);
                 throw;
             }
             catch (IndexOutOfRangeException e)
             {
-                Console.WriteLine("Not Enough altitude columns in a row:");
-                Console.WriteLine(e.Message);
+                // TODO put logging here
+                Debug.WriteLine("Not Enough altitude columns in a row:");
+                Debug.WriteLine(e.Message);
                 throw;
             }
         }
@@ -136,23 +157,21 @@ namespace MapViewer.Core.Utils
         /// </summary>
         /// <param name="filepath">Path to the file to be created.</param>
         /// <param name="map">Loaded map data.</param>
-        public static async void SaveMap(string filepath, MapData map)
+        public static async Task SaveMapAsync(string filepath, MapData map)
         {
-            using (StreamWriter writer = new StreamWriter(filepath))
+            using StreamWriter writer = new(filepath);
+            await writer.WriteLineAsync(String.Format("ncols        {0}", map.ColumnCount));
+            await writer.WriteLineAsync(String.Format("nrows        {0}", map.RowCount));
+            await writer.WriteLineAsync(String.Format(CultureInfo.InvariantCulture, "xllcorner    {0:F12}", map.XLLCorner));
+            await writer.WriteLineAsync(String.Format(CultureInfo.InvariantCulture, "yllcorner    {0:F12}", map.YLLCorner));
+            await writer.WriteLineAsync(String.Format(CultureInfo.InvariantCulture, "cellsize     {0:F12}", map.CellSize));
+            for (int i = 0; i < map.Altitude.GetLength(0); i++)
             {
-                await writer.WriteLineAsync(String.Format("ncols        {0}", map.ColumnCount));
-                await writer.WriteLineAsync(String.Format("nrows        {0}", map.RowCount));
-                await writer.WriteLineAsync(String.Format(CultureInfo.InvariantCulture, "xllcorner    {0:F12}", map.XLLCorner));
-                await writer.WriteLineAsync(String.Format(CultureInfo.InvariantCulture, "yllcorner    {0:F12}", map.YLLCorner));
-                await writer.WriteLineAsync(String.Format(CultureInfo.InvariantCulture, "cellsize     {0:F12}", map.CellSize));
-                for (int i = 0; i < map.Altitude.GetLength(0); i++)
+                for (int j = 0; j < map.Altitude.GetLength(1); j++)
                 {
-                    for (int j = 0; j < map.Altitude.GetLength(1); j++)
-                    {
-                        await writer.WriteAsync(" " + map.Altitude[i, j]);
-                    }
-                    await writer.WriteAsync("\n");
+                    await writer.WriteAsync(" " + map.Altitude[i, j]);
                 }
+                await writer.WriteAsync("\n");
             }
         }
     }

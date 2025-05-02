@@ -1,6 +1,8 @@
 ﻿using MapViewer.Core.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -9,9 +11,12 @@ using System.Threading.Tasks;
 
 namespace MapViewer.Core.Models
 {
+    /// <summary>
+    /// Model for a map to be rendered in Viewport3D.
+    /// </summary>
     public class Map
     {
-        private readonly MapMesh _simpleMesh;
+        private readonly Mesh _mapMesh;
 
         /// <summary>
         /// Map data parsed from a file.
@@ -19,34 +24,37 @@ namespace MapViewer.Core.Models
         public MapData Data { get; }
 
         /// <summary>
-        /// Simple map mesh for MeshGeometry3D with all normals in the global map direction, 
-        /// not in the direction of each triangle.
+        /// Mesh for rendering a map based on <see cref="Data"/>.
         /// </summary>
-        public MapMesh SimpleMesh {
-            get => _simpleMesh;
+        public Mesh MapMesh {
+            get => _mapMesh;
         }
 
         /// <summary>
-        /// Instantiate model for a map which is based on map data from a file and displayed as MapMesh.
+        /// Model for a map to be rendered in Viewport3D.
         /// </summary>
         /// <param name="data">Map data from a file.</param>
         public Map(MapData data)
         {
             Data = data;
-            _simpleMesh = GenerateSimpleMesh();
+            _mapMesh = GenerateMap();
         }
 
         /// <summary>
-        /// Construct a Map from MapData.
+        /// Generate a mesh for rendering a map based on <see cref="Data"/>.
         /// </summary>
         /// <returns>MapMesh based on MapData</returns>
-        private MapMesh GenerateSimpleMesh()
+        private Mesh GenerateMap()
         {
-            return new MapMesh(
-                GenerateSimpleMeshPositions(),
-                GenerateSimpleMeshNormals(),
-                GenerateSimpleMeshTextureCoordinates(),
-                GenerateSimpleMeshTriangleIndices()
+            var positions = GenerateMapPositions();
+            var normals = GenerateMapNormals(positions);
+            var textureCoords = GenerateMapTextureCoordinates();
+            var triangleIndices = GenerateMapTriangleIndices();
+            return new Mesh(
+                positions,
+                normals,
+                textureCoords,
+                triangleIndices
                 );
             
         }
@@ -54,71 +62,85 @@ namespace MapViewer.Core.Models
         /// <summary>
         /// Convert MapData to a list of vertices, where each vertex will be included only once.
         /// </summary>
-        /// <returns>List of vertices as a string.</returns>
-        private string GenerateSimpleMeshPositions()
+        /// <returns>List of vertices as 3-dimensional vectors.</returns>
+        private List<Vector3> GenerateMapPositions()
         {
-            StringBuilder sb = new StringBuilder();
+            List<Vector3> positions = [];
             for (int i = 0; i < Data.Altitude.GetLength(0); i++)
             {
                 for (int j = 0; j < Data.Altitude.GetLength(1); j++)
                 {
-                    sb.AppendFormat("{0},{1},{2} ", 
+                    positions.Add( new Vector3(
                         ColumnToXCoordinate(j),
                         RowToYCoordinate(i),
-                        Data.Altitude[i,j]);
+                        Data.Altitude[i, j]));
                 }
             }
-            return sb.ToString();
+            return positions;
         }
 
         /// <summary>
-        /// Create list of normals pointing in Z direction for each vertex.
+        /// Create list of normals pointing in direction perpendicular to a vector
+        /// from a given position to the next position in a row, and to a vector
+        /// from a given position to the next poisition in a column.
         /// </summary>
-        /// <returns>List of normals as a string.</returns>
-        private string GenerateSimpleMeshNormals()
+        /// <returns>List of normals.</returns>
+        private List<Vector3> GenerateMapNormals(List<Vector3> positions)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendJoin(" ", Enumerable.Repeat("0,0,1", Convert.ToInt32(Data.RowCount * Data.ColumnCount)));
-            return sb.ToString();
+            List<Vector3> normals = [];
+
+            for (int i = 0; i < Data.Altitude.GetLength(0) - 1; i++)
+            {
+                for (int j = 0; j < Data.Altitude.GetLength(1) - 1; j++)
+                {
+                    normals.Add(Vector3.Cross(
+                    positions[(j + 1) * Data.ColumnCount + i] - positions[j * Data.ColumnCount + i],
+                    positions[j * Data.ColumnCount + i + 1] - positions[j * Data.ColumnCount + i]
+                    ));
+                }
+            }
+            return normals;
         }
 
         /// <summary>
         /// Convert vertex Z directions (altitude) to a list of texture coordinates.
+        /// Texture coordinates are from a diagonal of a 2D LinearGradientBrush,
+        /// [0,0] for the lowest point and [1,1] for the highest point.
         /// </summary>
-        /// <returns>List of texture coordinates as a string for each vertex based on its altitude.</returns>
-        private string GenerateSimpleMeshTextureCoordinates()
+        /// <returns>List of texture coordinates for each vertex based on its altitude.</returns>
+        private List<Vector2> GenerateMapTextureCoordinates()
         {
-            StringBuilder sb = new StringBuilder();
+            List<Vector2> textureCoords = [];
+            float textureXY;
             for (int i = 0; i < Data.Altitude.GetLength(0); i++)
             {
                 for (int j = 0; j < Data.Altitude.GetLength(1); j++)
                 {
-                    sb.AppendFormat("{0},{0} ",
-                        AltitudeToTextureCoordinate(Data.Altitude[i, j]));
+                    textureXY = AltitudeToTextureCoordinate(Data.Altitude[i, j]);
+                    textureCoords.Add(new Vector2(textureXY, textureXY));
                 }
             }
-            return sb.ToString();
+            return textureCoords;
         }
 
         /// <summary>
         /// Convert map vertices to triangles represented by indexes of the vertices.
+        /// Composes a map out of squares and squares out of two triangles each.
         /// </summary>
-        /// <returns>List of triangle indices as a string.</returns>
-        private string GenerateSimpleMeshTriangleIndices()
+        /// <returns>List of triangle indices.</returns>
+        private List<int> GenerateMapTriangleIndices()
         {
-            StringBuilder sb = new StringBuilder();
-            long[] indices;
+            List<int> indices = [];
+            IEnumerable<int> square;
             for (int i = 0; i < Data.Altitude.GetLength(0)-1; i++)
             {
                 for (int j = 0; j < Data.Altitude.GetLength(1)-1; j++)
                 {
-                    indices = CoordinateTo2TriangleIndices(i, j);
-                    sb.AppendFormat("{0},{1},{2} {3},{4},{5} ",
-                        indices[0], indices[1], indices[2], indices[3], indices[4], indices[5]);
+                    square = CoordinateTo2TriangleIndices(i, j);
+                    indices.AddRange(square);
                 }
             }
-            return sb.ToString();
-
+            return indices;
         }
 
         /// <summary>
@@ -128,8 +150,8 @@ namespace MapViewer.Core.Models
         /// <returns>Y coordinate</returns>
         private float RowToYCoordinate(int row)
         {
-            var yOffset = Data.YLLCorner + (Data.RowCount - 1) * Data.CellSize;
-            return yOffset - (row * Data.CellSize);
+            return Data.YLLCorner + 
+                (Data.RowCount - 1 - row) * Data.CellSize;
         }
 
         /// <summary>
@@ -139,8 +161,7 @@ namespace MapViewer.Core.Models
         /// <returns>X coordinate</returns>
         private float ColumnToXCoordinate(int column)
         {
-            var xOffset = Data.XLLCorner + (Data.ColumnCount - 1) * Data.CellSize;
-            return xOffset - (column * Data.CellSize);
+            return Data.XLLCorner + (column * Data.CellSize);
         }
 
         /// <summary>
@@ -150,7 +171,7 @@ namespace MapViewer.Core.Models
         /// </summary>
         /// <param name="altitude">Map altitude in a vertex.</param>
         /// <returns>Texture coordinate for both X and Y axis.</returns>
-        private float AltitudeToTextureCoordinate(uint altitude)
+        private float AltitudeToTextureCoordinate(int altitude)
         {
             try { 
                 return (Convert.ToSingle(altitude) - Data.MinAltitude) / (Data.MaxAltitude - Data.MinAltitude);
@@ -174,9 +195,9 @@ namespace MapViewer.Core.Models
         /// Should not be grater than Data.ColumnCount-2.
         /// </param>
         /// <returns>Triangle indices as a string.</returns>
-        private long[] CoordinateTo2TriangleIndices(int row, int column)
+        private IEnumerable<int> CoordinateTo2TriangleIndices(int row, int column)
         {
-            var triangle1index1 = row * Data.ColumnCount + column;
+            int triangle1index1 = row * Data.ColumnCount + column;
             var triangle1index2 = (row + 1) * Data.ColumnCount + column;
             var triangle1index3 = (row + 1) * Data.ColumnCount + column + 1;
             var triangle2index1 = row * Data.ColumnCount + column;
