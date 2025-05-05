@@ -13,6 +13,9 @@ namespace MapViewer.Core.Models
     /// </summary>
     public class Circle
     {
+        private readonly Mesh _circleMesh;
+        private readonly Mesh _centerMesh;
+
         /// <summary>
         /// Circle's center point.
         /// </summary>
@@ -23,7 +26,6 @@ namespace MapViewer.Core.Models
         /// </summary>
         public float Radius { get; }
 
-        private readonly Mesh _circleMesh;
 
         /// <summary>
         /// Mesh for rendering circle in the map.
@@ -33,7 +35,6 @@ namespace MapViewer.Core.Models
         /// <summary>
         /// Mesh for rendering circle's center in the map.
         /// </summary>
-        private readonly Mesh _centerMesh;
         public Mesh CenterMesh { get => _centerMesh; }
 
         /// <summary>

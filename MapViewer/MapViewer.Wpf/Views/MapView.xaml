@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="MapViewer.Wpf.Views.Map"
+﻿<UserControl x:Class="MapViewer.Wpf.Views.MapView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

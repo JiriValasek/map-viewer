@@ -10,6 +10,7 @@
              d:DataContext="{d:DesignInstance Type=vm:MapViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <converters:ColoConverter x:Key="ColorToBrushConverter" />
         <converters:Vector3Converter x:Key="Vector3Converter" />
         <converters:Vector3CollectionConverter x:Key="Vector3CollectionConverter" />
         <converters:Vector2CollectionConverter x:Key="Vector2CollectionConverter" />
@@ -60,8 +61,9 @@
                                         <DiffuseMaterial>
                                             <DiffuseMaterial.Brush>
                                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                    <GradientStop Color="Black" Offset="0.0" />
-                                                    <GradientStop Color="White" Offset="1.0" />
+                                                    <GradientStop Color="{Binding MinAltitudeColor, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}" 
+                                                                  Offset="0.0" />
+                                                    <GradientStop Color="{Binding MaxAltitudeColor, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}" Offset="1.0" />
                                                 </LinearGradientBrush>
                                             </DiffuseMaterial.Brush>
                                         </DiffuseMaterial>
@@ -79,7 +81,7 @@
                                         <MaterialGroup>
                                             <DiffuseMaterial>
                                                 <DiffuseMaterial.Brush>
-                                                    <SolidColorBrush Color="Blue"/>
+                                                    <SolidColorBrush Color="{Binding CircleColor, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}"/>
                                                 </DiffuseMaterial.Brush>
                                             </DiffuseMaterial>
                                         </MaterialGroup>
@@ -98,7 +100,7 @@
                                         <MaterialGroup>
                                             <DiffuseMaterial>
                                                 <DiffuseMaterial.Brush>
-                                                    <SolidColorBrush Color="Red"/>
+                                                    <SolidColorBrush Color="{Binding CenterColor, Converter={StaticResource ColorToBrushConverter}, Mode=OneWay}"/>
                                                 </DiffuseMaterial.Brush>
                                             </DiffuseMaterial>
                                         </MaterialGroup>

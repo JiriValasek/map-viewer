@@ -7,11 +7,21 @@
         xmlns:v="clr-namespace:MapViewer.Wpf.Views"
         xmlns:vm="clr-namespace:MapViewer.Core.ViewModels;assembly=MapViewer.Core"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="{Binding Title}" 
         MinHeight="450" 
         MinWidth="800"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="0">
-        <v:Map DataContext="{Binding CurrentViewModel}" />
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type vm:MapViewModel}">
+                <v:MapView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+                <v:SettingsView />
+            </DataTemplate>
+        </Grid.Resources>
+
+        <ContentControl Content="{Binding CurrentViewModel}" />
+        
     </Grid>
 </Window>

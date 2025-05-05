@@ -24,6 +24,7 @@ namespace MapViewer.Wpf.Views
     /// </summary>
     public partial class MapViewportView : UserControl
     {
+        private Window? _window = null;
 
         /// <summary>
         /// Dependency property for all mouse commands - zoom, pan, altitude reading, circle drawing.
@@ -80,8 +81,8 @@ namespace MapViewer.Wpf.Views
         /// </summary>
         private void Viewport3D_Loaded(object sender, RoutedEventArgs e)
         {
-            Window.GetWindow(this).KeyDown += Viewport3D_HandleKey;
-            e.Handled = true;
+            _window = Window.GetWindow(this);
+            _window.KeyDown += Viewport3D_HandleKey;
         }
 
         /// <summary>
@@ -89,8 +90,10 @@ namespace MapViewer.Wpf.Views
         /// </summary>
         private void Viewport3D_Unloaded(object sender, RoutedEventArgs e)
         {
-            Window.GetWindow(this).KeyDown -= Viewport3D_HandleKey;
-            e.Handled = true;
+            if (_window is not null)
+            {
+                _window.KeyDown -= Viewport3D_HandleKey;
+            }
         }
 
         /// <summary>

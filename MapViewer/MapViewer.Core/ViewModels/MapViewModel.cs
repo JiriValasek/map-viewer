@@ -1,11 +1,15 @@
-﻿using MapViewer.Core.Commands;
+﻿using CameraViewer.Core.Stores;
+using MapViewer.Core.Commands;
 using MapViewer.Core.Exceptions;
 using MapViewer.Core.Models;
+using MapViewer.Core.Services;
+using MapViewer.Core.Stores;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -17,24 +21,30 @@ namespace MapViewer.Core.ViewModels
     /// <summary>
     /// ViewModel for the map view.
     /// </summary>
-    public class MapViewModel : BaseViewModel
+    public class MapViewModel : WindowViewModel
     {
-        private Map? _map;
+        private readonly MapStore _mapStore;
+        private readonly CameraStore _cameraStore;
+        private readonly SettingsStore _settingsStore;
         private bool _showMapOverlay = false;
         private string _mapOverlayText = "";
         private Circle? _circle;
-        private Camera? _camera;
         private Vector3? _cursor;
+
+        /// <summary>
+        /// Title overwrite for the window's title.
+        /// </summary>
+        public override string Title { get => "MapViewer - Map"; }
 
         /// <summary>
         /// Map model for rendering.
         /// </summary>
         public Map? Map
         {
-            get => _map;
+            get => _mapStore.Map;
             set
             {
-                _map = value;
+                _mapStore.Map = value;
                 OnPropertyChanged(nameof(Map));
                 if (value is not null)
                 {
@@ -94,10 +104,10 @@ namespace MapViewer.Core.ViewModels
         /// Camera model for rendering.
         /// </summary>
         public Camera? Camera {
-            get => _camera;
+            get => _cameraStore.Camera;
             set
             {
-                _camera = value;
+                _cameraStore.Camera = value;
                 OnPropertyChanged(nameof(Camera));
             }
         }
@@ -112,6 +122,32 @@ namespace MapViewer.Core.ViewModels
                 _cursor = value;
                 OnPropertyChanged(nameof(Cursor));
             } 
+        }
+
+        public Color MinAltitudeColor
+        {
+            get 
+            {
+                return _settingsStore.Settings.MinAltitudeColor;
+            }
+        }
+
+        public Color MaxAltitudeColor
+        {
+            get
+            {
+                return _settingsStore.Settings.MaxAltitudeColor;
+            }
+        }
+
+        public Color CircleColor
+        {
+            get => _settingsStore.Settings.CircleColor;
+        }
+
+        public Color CenterColor
+        {
+            get => _settingsStore.Settings.CenterColor;
         }
 
         /// <summary>
@@ -136,16 +172,26 @@ namespace MapViewer.Core.ViewModels
         /// <param name="saveMapCommand">Function creating commandfor saving a map to a file.</param>
         /// <param name="handleMouseCommand">Function creatin command for handling mouse commands.</param>
         /// <param name="handleKeyCommand">Function creatin command for handling keyboard commands.</param>
-        public MapViewModel(Func<MapViewModel, ICommand> loadMapCommand, 
+        public MapViewModel(
+            MapStore mapStore,
+            CameraStore cameraStore,
+            SettingsStore settingsStore,
+            NavigationService navigateToSettings,
+            Func<MapViewModel, ICommand> loadMapCommand, 
             Func<MapViewModel, ICommand> saveMapCommand,
             Func<MapViewModel, ICommand> handleMouseCommand,
             Func<MapViewModel, ICommand> handleKeyCommand)
         {
+            _mapStore = mapStore;
+            _cameraStore = cameraStore;
+            _settingsStore = settingsStore;
+            _settingsStore.CurrentSettingsChanged += OnCurrentSettingsChanged;
             HandleMouseCommand = handleMouseCommand(this);
             HandleKeyCommand = handleKeyCommand(this);
             MenuItems = [];
-            SetupMenu(loadMapCommand(this), saveMapCommand(this), new ResetViewCommand(this));
+            SetupMenu(loadMapCommand(this), saveMapCommand(this), new NavigateCommand(navigateToSettings), new ResetViewCommand(this));
         }
+
 
         /// <summary>
         /// Update Vector3D <see cref="Cursor"/> field based on a 2D location.
@@ -179,7 +225,7 @@ namespace MapViewer.Core.ViewModels
         /// <param name="loadMapCommand">Command for loading a map from a file.</param>
         /// <param name="saveMapCommand">Command for saving a map to a file.</param>
         /// <param name="resetViewCommand">Command for reseting the <see cref="Camera"/>. </param>
-        private void SetupMenu(ICommand loadMapCommand, ICommand saveMapCommand, ICommand resetViewCommand)
+        private void SetupMenu(ICommand loadMapCommand, ICommand saveMapCommand, ICommand settingsCommand, ICommand resetViewCommand)
         {
             // map menu
             var mapMenu = new MenuItemViewModel("Map");
@@ -187,12 +233,27 @@ namespace MapViewer.Core.ViewModels
             mapMenu.MenuItems.Add(loadMap);
             var saveMap = new MenuItemViewModel("Save", saveMapCommand);
             mapMenu.MenuItems.Add(saveMap);
+            var settigns = new MenuItemViewModel("Settings", settingsCommand);
+            mapMenu.MenuItems.Add(settigns);
             MenuItems.Add(mapMenu);
             // view menu
             var viewMenu = new MenuItemViewModel("View");
             var resetView = new MenuItemViewModel("Reset", resetViewCommand);
             viewMenu.MenuItems.Add(resetView);
             MenuItems.Add(viewMenu);
+        }
+
+        private void OnCurrentSettingsChanged()
+        {
+            OnPropertyChanged(nameof(MinAltitudeColor));
+            OnPropertyChanged(nameof(MaxAltitudeColor));
+            OnPropertyChanged(nameof(CircleColor));
+            OnPropertyChanged(nameof(CenterColor));
+        }
+
+
+        public override void Dispose() {
+            _settingsStore.CurrentSettingsChanged -= OnCurrentSettingsChanged;
         }
     }
 }
