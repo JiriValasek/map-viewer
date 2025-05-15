@@ -35,7 +35,7 @@ namespace MapViewer.Wpf.Commands
         private readonly float CENTER_SIZE = 5;
 
         /// <summary>
-        /// Size of the cirle center and cirle lines in pixels.
+        /// Size of the circle center and circle lines in pixels.
         /// </summary>
         private readonly float LINE_WIDTH = 3;
 
@@ -92,7 +92,7 @@ namespace MapViewer.Wpf.Commands
             if (_lastCirclePosition.HasValue)
             {
                 var newPosition = GetMapSystemPoint(mapMouseEventArgs, camera);
-                //TODO Move constans to config
+                //TODO Move constants to config
                 mapViewModel.Circle = new Circle(
                     new Vector2((float)_lastCirclePosition.Value.X, (float)_lastCirclePosition.Value.Y),
                     (float)Math.Sqrt(Math.Pow(newPosition.X - _lastCirclePosition.Value.X, 2) + Math.Pow(newPosition.Y - _lastCirclePosition.Value.Y, 2)),
@@ -105,7 +105,7 @@ namespace MapViewer.Wpf.Commands
             // Record circle center for drawing
             if (mapMouseEventArgs.MouseEventArgs.LeftButton == MouseButtonState.Pressed)
             {
-                _lastCirclePosition = _lastCirclePosition == null ? global::MapViewer.Wpf.Commands.HandleMouseCommand.GetMapSystemPoint(mapMouseEventArgs, camera) : null;
+                _lastCirclePosition = _lastCirclePosition == null ? GetMapSystemPoint(mapMouseEventArgs, camera) : null;
             }
         }
 
@@ -141,9 +141,9 @@ namespace MapViewer.Wpf.Commands
         {
             if (mapMouseEventArgs.MouseEventArgs is MouseWheelEventArgs mouseWheelEventArgs)
             {
-                // Zoom by adjusting camera width, adjust position to zoom towareds mouse
+                // Zoom by adjusting camera width, adjust position to zoom towards mouse
                 // Do not let zoomed with get negative - it causes circle to disappear
-                //TODO Move constans to config
+                //TODO Move constants to config
                 float zoomedWidth = (float)Math.Max(0.5, camera.Width - mouseWheelEventArgs.Delta * ZOOM_SENSITIVITY);
                 Point mapPoint = GetMapSystemPoint(mapMouseEventArgs, camera);
                 mapViewModel.Camera = new Camera(zoomedWidth,
@@ -151,7 +151,7 @@ namespace MapViewer.Wpf.Commands
                     (float)(camera.Position.Y + (mapPoint.Y - camera.Position.Y) * (1 - zoomedWidth / camera.Width)),
                     camera.Position.Z);
                 // Update Circle to keep line width and center size
-                //TODO Move constans to config
+                //TODO Move constants to config
                 mapViewModel.Circle = mapViewModel.Circle == null? null: new Circle(
                     mapViewModel.Circle.Center, 
                     mapViewModel.Circle.Radius,
@@ -176,7 +176,7 @@ namespace MapViewer.Wpf.Commands
         }
 
         /// <summary>
-        /// Get cursor postion in camera/map coordinate system.
+        /// Get cursor position in camera/map coordinate system.
         /// </summary>
         /// <param name="mapMouseEventArgs">Mouse event args with a relative viewport mouse position.</param>
         /// <param name="camera">Camera for conversion of a position to the camera space.</param>
