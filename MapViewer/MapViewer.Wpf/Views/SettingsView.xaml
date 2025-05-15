@@ -12,13 +12,21 @@
              FontSize="14"
              Margin="10,0">
     <UserControl.Resources>
-
-        <converters:ColoConverter x:Key="ColorToBrushConverter" />
-        
+        <converters:ColorConverter x:Key="ColorConverter" />
         <Style x:Key="SectionStyle" TargetType="Label">
-            <Setter Property="Margin" Value="0,10,0,0" />
-            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="FontWeight" Value="DemiBold" />
+        </Style>
+
+        <Style x:Key="InputLabelStyle" TargetType="Label">
+            <Setter Property="Margin" Value="10,3,0,2" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10,4"/>
         </Style>
 
         <Style x:Key="TextBoxInError" TargetType="{x:Type TextBox}">
@@ -35,9 +43,10 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                  HorizontalAlignment="Stretch">
         <Grid Grid.IsSharedSizeScope="True"
-          HorizontalAlignment="Stretch">
+          HorizontalAlignment="Center">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -69,11 +78,10 @@
 
                 <Label Grid.Row="0"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
                        Content="Min altitude color"
-                       HorizontalContentAlignment="Right"
-                       Foreground="{Binding MinAltitudeColorForeground, Converter={StaticResource ColorToBrushConverter}}"
-                       Background="{Binding MinAltitudeColorBackground, Converter={StaticResource ColorToBrushConverter}}"/>
+                       Foreground="{Binding MinAltitudeColorForeground, Converter={StaticResource ColorConverter}}"
+                       Background="{Binding MinAltitudeColorBackground, Converter={StaticResource ColorConverter}}"/>
                 <TextBox Grid.Row="0"
                          Grid.Column="1"
                          Margin="10,3"
@@ -82,11 +90,11 @@
 
                 <Label Grid.Row="1"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
                        Content="Min altitude color"
                        HorizontalContentAlignment="Right"
-                       Foreground="{Binding MaxAltitudeColorForeground, Converter={StaticResource ColorToBrushConverter}}"
-                       Background="{Binding MaxAltitudeColorBackground, Converter={StaticResource ColorToBrushConverter}}"/>
+                       Foreground="{Binding MaxAltitudeColorForeground, Converter={StaticResource ColorConverter}}"
+                       Background="{Binding MaxAltitudeColorBackground, Converter={StaticResource ColorConverter}}"/>
                 <TextBox Grid.Row="1"
                          Grid.Column="1"
                          Margin="10,3"
@@ -113,11 +121,10 @@
 
                 <Label Grid.Row="0"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
                        Content="Circle color" 
-                       HorizontalContentAlignment="Right"
-                       Foreground="{Binding CircleColorForeground, Converter={StaticResource ColorToBrushConverter}}"
-                       Background="{Binding CircleColorBackground, Converter={StaticResource ColorToBrushConverter}}"/>
+                       Foreground="{Binding CircleColorForeground, Converter={StaticResource ColorConverter}}"
+                       Background="{Binding CircleColorBackground, Converter={StaticResource ColorConverter}}"/>
                 <TextBox Grid.Row="0"
                          Grid.Column="1"
                          Margin="10,3"
@@ -126,11 +133,10 @@
 
                 <Label Grid.Row="1"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
                        Content="Center color" 
-                       HorizontalContentAlignment="Right"
-                       Foreground="{Binding CenterColorForeground, Converter={StaticResource ColorToBrushConverter}}"
-                       Background="{Binding CenterColorBackground, Converter={StaticResource ColorToBrushConverter}}"/>
+                       Foreground="{Binding CenterColorForeground, Converter={StaticResource ColorConverter}}"
+                       Background="{Binding CenterColorBackground, Converter={StaticResource ColorConverter}}"/>
                 <TextBox Grid.Row="1" 
                          Grid.Column="1"
                          Margin="10,3"
@@ -139,9 +145,8 @@
 
                 <Label Grid.Row="2"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
-                       Content="Line Width"
-                       HorizontalContentAlignment="Right" />
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
+                       Content="Line Width"/>
                 <TextBox Grid.Row="2"
                          Grid.Column="1"
                          Margin="10,3"
@@ -150,9 +155,8 @@
 
                 <Label Grid.Row="3"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
-                       Content="Center size"
-                       HorizontalContentAlignment="Right"/>
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
+                       Content="Center size"/>
                 <TextBox Grid.Row="3"
                          Grid.Column="1"
                          Margin="10,3"
@@ -161,9 +165,8 @@
 
                 <Label Grid.Row="4"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
-                       Content="Segment count"
-                       HorizontalContentAlignment="Right" />
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
+                       Content="Segment count"/>
                 <TextBox Grid.Row="4"
                          Grid.Column="1"
                          Margin="10,3"
@@ -187,9 +190,8 @@
 
                 <Label Grid.Row="0"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
-                       Content="Zoom sensitivity"
-                       HorizontalContentAlignment="Right" />
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
+                       Content="Zoom sensitivity"/>
                 <TextBox Grid.Row="0"
                          Grid.Column="1"
                          Margin="10,3"
@@ -198,9 +200,8 @@
 
                 <Label Grid.Row="1"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
-                       Content="Rotation step"
-                       HorizontalContentAlignment="Right" />
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
+                       Content="Rotation step"/>
                 <TextBox Grid.Row="1"
                          Grid.Column="1"
                          Margin="10,3"
@@ -209,9 +210,8 @@
 
                 <Label Grid.Row="2"
                        Grid.Column="0"
-                       Margin="10,2,0,2"
-                       Content="Movement step"
-                       HorizontalContentAlignment="Right" />
+                       Style="{StaticResource ResourceKey=InputLabelStyle}"
+                       Content="Movement step"/>
                 <TextBox Grid.Row="2"
                          Grid.Column="1"
                          Margin="10,3"
@@ -224,7 +224,7 @@
                         Grid.Column="0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
-                        Margin="10,15,0,15"
+                        Margin="10,20,0,15"
                         Orientation="Horizontal">
                 <Button Command="{Binding SaveCommand}"
                         Content="Save" />
