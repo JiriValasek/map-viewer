@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MapViewer.Core.Models
 {
@@ -127,6 +128,68 @@ namespace MapViewer.Core.Models
         }
 
         /// <summary>
+        /// Convert Row (the first index) to a Y coordinate.
+        /// </summary>
+        /// <param name="row">Zero indexed row.</param>
+        /// <returns>Y coordinate</returns>
+        public float RowToYCoordinate(int row)
+        {
+            return YLLCorner + (RowCount - 1 - row) * CellSize;
+        }
+
+        /// <summary>
+        /// Convert Y coordinate to a Row (the first) index, above/below.
+        /// </summary>
+        /// <param name="yCoordinate">Y coordinate in the map.</param>
+        /// <param name="above">Get the closest row above the Y coordinate if true, otherwise the closest row below.</param>
+        /// <returns>Row index</returns>
+        public int YCoordinateToRow(float yCoordinate, bool above)
+        {
+
+            if (above)
+            {
+                // Floor is above, becouse y axis is flipped
+                return RowCount - 1 - Convert.ToInt32(Math.Floor((yCoordinate - YLLCorner) / CellSize));
+            }
+            else
+            {
+                // Ceiling is below, becouse y axis is flipped
+                return RowCount - 1 - Convert.ToInt32(Math.Ceiling((yCoordinate - YLLCorner) / CellSize));
+
+            }
+        }
+
+        /// <summary>
+        /// Convert Column (the second index) to a X coordinate.
+        /// </summary>
+        /// <param name="column">Zero indexed column.</param>
+        /// <returns>X coordinate</returns>
+        public float ColumnToXCoordinate(int column)
+        {
+            return XLLCorner + (column * CellSize);
+        }
+
+        /// <summary>
+        /// Convert X coordinate to a Column (the second) index, above/below.
+        /// </summary>
+        /// <param name="xCoordinate">X coordinate in the map.</param>
+        /// <param name="above">Get the closest row above the Y coordinate if true, otherwise the closest row below.</param>
+        /// <returns>Row index</returns>
+        public int XCoordinateToColumn(float xCoordinate, bool above)
+        {
+
+            if (above)
+            {
+                return Convert.ToInt32(Math.Ceiling((xCoordinate - XLLCorner) / CellSize));
+            }
+            else
+            {
+                return Convert.ToInt32(Math.Floor((xCoordinate - XLLCorner) / CellSize));
+
+            }
+        }
+
+        /// <summary>
         /// Bilinear Interpolation for the altitude.
         /// </summary>
         /// <param name="coords">Map coordinates as a 2D vector.</param>
@@ -134,15 +197,15 @@ namespace MapViewer.Core.Models
         private float BilinearAltitudeInterpolation(Vector2 coords)
         {
             // Get corresponding indices
-            uint indX1 = (uint)Math.Floor(coords.X / CellSize);
-            uint indX2 = (uint)Math.Ceiling(coords.X / CellSize);
-            uint indY1 = (uint)Math.Floor(coords.Y / CellSize);
-            uint indY2 = (uint)Math.Ceiling(coords.Y / CellSize);
+            int indX1 = XCoordinateToColumn(coords.X, false);
+            int indX2 = XCoordinateToColumn(coords.X, true);
+            int indY1 = YCoordinateToRow(coords.Y, false);
+            int indY2 = YCoordinateToRow(coords.Y, true);
             // Init coordinates of interpolated points
-            float x1 = (float)(indX1 * CellSize);
-            float x2 = (float)(indX2 * CellSize);
-            float y1 = (float)(indY1 * CellSize);
-            float y2 = (float)(indY2 * CellSize);
+            float x1 = ColumnToXCoordinate(indX1);
+            float x2 = ColumnToXCoordinate(indX2);
+            float y1 = RowToYCoordinate(indY1);
+            float y2 = RowToYCoordinate(indY2);
             // Prepare transformation matrix
             Matrix4x4 transform = Matrix4x4.Transpose(new Matrix4x4(
                 x2*y2, -x2*y1, -x1*y2, x1*y1,

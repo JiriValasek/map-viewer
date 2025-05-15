@@ -71,8 +71,8 @@ namespace MapViewer.Core.Models
                 for (int j = 0; j < Data.Altitude.GetLength(1); j++)
                 {
                     positions.Add( new Vector3(
-                        ColumnToXCoordinate(j),
-                        RowToYCoordinate(i),
+                        Data.ColumnToXCoordinate(j),
+                        Data.RowToYCoordinate(i),
                         Data.Altitude[i, j]));
                 }
             }
@@ -141,27 +141,6 @@ namespace MapViewer.Core.Models
                 }
             }
             return indices;
-        }
-
-        /// <summary>
-        /// Convert Row (the first index) to a Y coordinate.
-        /// </summary>
-        /// <param name="row">Zero indexed row.</param>
-        /// <returns>Y coordinate</returns>
-        private float RowToYCoordinate(int row)
-        {
-            return Data.YLLCorner + 
-                (Data.RowCount - 1 - row) * Data.CellSize;
-        }
-
-        /// <summary>
-        /// Convert Column (the second index) to a X coordinate.
-        /// </summary>
-        /// <param name="column">Zero indexed column.</param>
-        /// <returns>X coordinate</returns>
-        private float ColumnToXCoordinate(int column)
-        {
-            return Data.XLLCorner + (column * Data.CellSize);
         }
 
         /// <summary>
