@@ -21,7 +21,7 @@ namespace MapViewer.Core.Utils
         private static readonly Regex X_LL_CORNER_REGEX = new("xllcorner\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex Y_LL_CORNER_REGEX = new("yllcorner\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex CELL_SIZE_REGEX = new("cellsize\\s+(?<value>\\d+\\.?\\d*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static readonly Regex ALTITUDE_REGEX = new("\\s*((?<value>\\d+)\\s*)*", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
+        private static readonly Regex ALTITUDE_REGEX = new("(\\s+(?<value>\\S+))+", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
         /// <summary>
         /// Parse ESRI like map files based on format from the assignment.
@@ -100,40 +100,31 @@ namespace MapViewer.Core.Utils
 
                 // parse altitude
                 Int32[,] altitude = new Int32[rowCount, columnCount];
-                try
+                for (altitudeLineN = 0; altitudeLineN < rowCount; altitudeLineN++)
                 {
-                    for (altitudeLineN = 0; altitudeLineN < rowCount; altitudeLineN++)
+                    line = await reader.ReadLineAsync() ?? throw new MapFileException(String.Format("Missing altitude rows."), 6 + altitudeLineN); ;
+                    match = ALTITUDE_REGEX.Match(line);
+                    if (!match.Success)
                     {
-                        line = await reader.ReadLineAsync() ?? "";
-                        match = ALTITUDE_REGEX.Match(line);
-                        if (!match.Success)
+                        throw new MapFileException(String.Format("Altitude row parsing failed, it should match {0}.", ALTITUDE_REGEX), 6 + altitudeLineN);
+                    }
+                    try
+                    {
+                        for (altitudeColumnN = 0; altitudeColumnN < columnCount; altitudeColumnN++)
                         {
-                            throw new MapFileException(String.Format("Altitude row parsing failed, it should match {0}.", ALTITUDE_REGEX), 6 + altitudeLineN);
-                        }
-                        try
-                        {
-                            for (altitudeColumnN = 0; altitudeColumnN < columnCount; altitudeColumnN++)
+                            if (!Int32.TryParse(match.Groups["value"].Captures[altitudeColumnN].Value, out altitude[altitudeLineN, altitudeColumnN]))
                             {
-                                if (!Int32.TryParse(match.Groups["value"].Captures[altitudeColumnN].Value, out altitude[altitudeLineN, altitudeColumnN]))
-                                {
-                                    throw new MapFileException(String.Format("Unable to parse altitude value number {0} a 32-bit integer.", altitudeColumnN), 6 + altitudeLineN);
-                                }
+                                throw new MapFileException(String.Format("Unable to parse altitude value number {0} a 32-bit integer.", altitudeColumnN), 6 + altitudeLineN);
                             }
                         }
-                        catch (ArgumentOutOfRangeException e)
-                        {
-                            throw new MapFileException(String.Format("Missing altitude columns."), e, 6 + altitudeLineN);
-
-                        }
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        throw new MapFileException(String.Format("Missing altitude columns."), e, 6 + altitudeLineN);
                     }
                 }
-                catch (ArgumentOutOfRangeException e)
-                {
-                    throw new MapFileException(String.Format("Missing altitude rows."), e, 6 + altitudeLineN);
 
-                }
-
-                return new MapData(filepath, columnCount, rowCount, xLLCorner, yLLCorner, cellSize, altitude);
+            return new MapData(filepath, columnCount, rowCount, xLLCorner, yLLCorner, cellSize, altitude);
 
             }
             catch (IOException e)
