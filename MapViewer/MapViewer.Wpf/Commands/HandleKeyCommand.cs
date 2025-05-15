@@ -1,5 +1,6 @@
 ﻿using MapViewer.Core.Commands;
 using MapViewer.Core.Models;
+using MapViewer.Core.Stores;
 using MapViewer.Core.ViewModels;
 using MapViewer.Wpf.EventArgs;
 using System;
@@ -19,18 +20,8 @@ namespace MapViewer.Wpf.Commands
     /// Command for handling all map keyboard inputs.
     /// </summary>
     /// <param name="mapViewModel">ViewModel for the map view.</param>
-    public class HandleKeyCommand(MapViewModel mapViewModel) : BaseCommand
+    public class HandleKeyCommand(SettingsStore settingsStore, MapViewModel mapViewModel) : BaseCommand
     {
-
-        /// <summary>
-        /// Rotation step in degrees.
-        /// </summary>
-        private readonly float ROTATION_SENSITIVITY = 0.1f;
-        
-        /// <summary>
-        /// Movement step in map units.
-        /// </summary>
-        private readonly float MOVEMENT_SENSITIVITY = 1f;
 
         public override void Execute(object? parameter)
         {
@@ -47,34 +38,34 @@ namespace MapViewer.Wpf.Commands
                 switch (keyEventArgs.Key)
                 {
                     case Key.A: 
-                        HorizontalMove(mapViewModel.Camera, -MOVEMENT_SENSITIVITY);
+                        HorizontalMove(mapViewModel.Camera, -settingsStore.Settings.MovementStep);
                         break;
                     case Key.D:
-                        HorizontalMove(mapViewModel.Camera, MOVEMENT_SENSITIVITY);
+                        HorizontalMove(mapViewModel.Camera, settingsStore.Settings.MovementStep);
                         break;
                     case Key.S:
-                        LateralMove(mapViewModel.Camera, -MOVEMENT_SENSITIVITY);
+                        LateralMove(mapViewModel.Camera, -settingsStore.Settings.MovementStep);
                         break;
                     case Key.W:
-                        LateralMove(mapViewModel.Camera, MOVEMENT_SENSITIVITY);
+                        LateralMove(mapViewModel.Camera, settingsStore.Settings.MovementStep);
                         break;
                     case Key.Q:
-                        VerticalMove(mapViewModel.Camera, -MOVEMENT_SENSITIVITY);
+                        VerticalMove(mapViewModel.Camera, -settingsStore.Settings.MovementStep);
                         break;
                     case Key.E:
-                        VerticalMove(mapViewModel.Camera, MOVEMENT_SENSITIVITY);
+                        VerticalMove(mapViewModel.Camera, settingsStore.Settings.MovementStep);
                         break;
                     case Key.Up:
-                        RotateAroundHorizontalAxis(mapViewModel.Camera, ROTATION_SENSITIVITY);
+                        RotateAroundHorizontalAxis(mapViewModel.Camera, settingsStore.Settings.RotationStep);
                         break;
                     case Key.Down:
-                        RotateAroundHorizontalAxis(mapViewModel.Camera, -ROTATION_SENSITIVITY);
+                        RotateAroundHorizontalAxis(mapViewModel.Camera, -settingsStore.Settings.RotationStep);
                         break;
                     case Key.Right:
-                        RotateAroundVerticalAxis(mapViewModel.Camera, ROTATION_SENSITIVITY);
+                        RotateAroundVerticalAxis(mapViewModel.Camera, settingsStore.Settings.RotationStep);
                         break;
                     case Key.Left:
-                        RotateAroundVerticalAxis(mapViewModel.Camera, -ROTATION_SENSITIVITY);
+                        RotateAroundVerticalAxis(mapViewModel.Camera, -settingsStore.Settings.RotationStep);
                         break;
                 }
                 keyEventArgs.Handled = true;

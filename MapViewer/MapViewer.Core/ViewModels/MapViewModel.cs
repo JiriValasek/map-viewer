@@ -1,9 +1,8 @@
-﻿using CameraViewer.Core.Stores;
+﻿using MapViewer.Core.Stores;
 using MapViewer.Core.Commands;
 using MapViewer.Core.Exceptions;
 using MapViewer.Core.Models;
 using MapViewer.Core.Services;
-using MapViewer.Core.Stores;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,11 +23,9 @@ namespace MapViewer.Core.ViewModels
     public class MapViewModel : WindowViewModel
     {
         private readonly MapStore _mapStore;
-        private readonly CameraStore _cameraStore;
         private readonly SettingsStore _settingsStore;
         private bool _showMapOverlay = false;
         private string _mapOverlayText = "";
-        private Circle? _circle;
         private Vector3? _cursor;
 
         /// <summary>
@@ -92,10 +89,10 @@ namespace MapViewer.Core.ViewModels
         /// </summary>
         public Circle? Circle
         {
-            get => _circle;
+            get => _mapStore.Circle;
             set
             {
-                _circle = value;
+                _mapStore.Circle = value;
                 OnPropertyChanged(nameof(Circle));
             }
         }
@@ -104,10 +101,10 @@ namespace MapViewer.Core.ViewModels
         /// Camera model for rendering.
         /// </summary>
         public Camera? Camera {
-            get => _cameraStore.Camera;
+            get => _mapStore.Camera;
             set
             {
-                _cameraStore.Camera = value;
+                _mapStore.Camera = value;
                 OnPropertyChanged(nameof(Camera));
             }
         }
@@ -174,7 +171,6 @@ namespace MapViewer.Core.ViewModels
         /// <param name="handleKeyCommand">Function creatin command for handling keyboard commands.</param>
         public MapViewModel(
             MapStore mapStore,
-            CameraStore cameraStore,
             SettingsStore settingsStore,
             NavigationService navigateToSettings,
             Func<MapViewModel, ICommand> loadMapCommand, 
@@ -183,7 +179,6 @@ namespace MapViewer.Core.ViewModels
             Func<MapViewModel, ICommand> handleKeyCommand)
         {
             _mapStore = mapStore;
-            _cameraStore = cameraStore;
             _settingsStore = settingsStore;
             _settingsStore.CurrentSettingsChanged += OnCurrentSettingsChanged;
             HandleMouseCommand = handleMouseCommand(this);

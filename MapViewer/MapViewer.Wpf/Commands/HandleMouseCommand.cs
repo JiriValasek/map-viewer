@@ -21,28 +21,8 @@ namespace MapViewer.Wpf.Commands
     /// Command for handling all map mouse inputs.
     /// </summary>
     /// <param name="mapViewModel">ViewModel for the map view.</param>
-    public class HandleMouseCommand(MapViewModel mapViewModel) : BaseCommand
+    public class HandleMouseCommand(Core.Stores.SettingsStore settingsStore, MapViewModel mapViewModel) : BaseCommand
     {
-
-        /// <summary>
-        /// Sensitivity of the zoom.
-        /// </summary>
-        private readonly float ZOOM_SENSITIVITY = 0.1f;
-
-        /// <summary>
-        /// Size of the circle center in pixels.
-        /// </summary>
-        private readonly float CENTER_SIZE = 5;
-
-        /// <summary>
-        /// Size of the cirle center and cirle lines in pixels.
-        /// </summary>
-        private readonly float LINE_WIDTH = 3;
-
-        /// <summary>
-        /// Number of line segments in a circle (should be greater than 20.
-        /// </summary>
-        private readonly int SEGMENT_COUNT = 100;
 
         /// <summary>
         /// Last mouse position for circle drawing.
@@ -97,9 +77,9 @@ namespace MapViewer.Wpf.Commands
                     new Vector2((float)_lastCirclePosition.Value.X, (float)_lastCirclePosition.Value.Y),
                     (float)Math.Sqrt(Math.Pow(newPosition.X - _lastCirclePosition.Value.X, 2) + Math.Pow(newPosition.Y - _lastCirclePosition.Value.Y, 2)),
                     mapData.MaxAltitude,
-                    (float)((CENTER_SIZE / mapMouseEventArgs.MapWidth) * camera.Width),
-                    (float)((LINE_WIDTH / mapMouseEventArgs.MapWidth) * camera.Width),
-                    SEGMENT_COUNT
+                    (float)((settingsStore.Settings.CenterSize / mapMouseEventArgs.MapWidth) * camera.Width),
+                    (float)((settingsStore.Settings.LineWidth / mapMouseEventArgs.MapWidth) * camera.Width),
+                    settingsStore.Settings.SegmentCount
                     );
             }
             // Record circle center for drawing
@@ -144,7 +124,7 @@ namespace MapViewer.Wpf.Commands
                 // Zoom by adjusting camera width, adjust position to zoom towareds mouse
                 // Do not let zoomed with get negative - it causes circle to disappear
                 //TODO Move constans to config
-                float zoomedWidth = (float)Math.Max(0.5, camera.Width - mouseWheelEventArgs.Delta * ZOOM_SENSITIVITY);
+                float zoomedWidth = (float)Math.Max(0.5, camera.Width - mouseWheelEventArgs.Delta * settingsStore.Settings.ZoomSensitivity);
                 Point mapPoint = GetMapSystemPoint(mapMouseEventArgs, camera);
                 mapViewModel.Camera = new Camera(zoomedWidth,
                     (float)(camera.Position.X + (mapPoint.X - camera.Position.X) * (1 - zoomedWidth / camera.Width)),
