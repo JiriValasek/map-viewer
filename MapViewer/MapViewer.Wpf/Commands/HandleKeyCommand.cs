@@ -44,39 +44,18 @@ namespace MapViewer.Wpf.Commands
             try
             {
                 KeyEventArgs keyEventArgs = (KeyEventArgs)parameter;
-                switch (keyEventArgs.Key)
-                {
-                    case Key.A: 
-                        HorizontalMove(mapViewModel.Camera, -MOVEMENT_SENSITIVITY);
-                        break;
-                    case Key.D:
-                        HorizontalMove(mapViewModel.Camera, MOVEMENT_SENSITIVITY);
-                        break;
-                    case Key.S:
-                        LateralMove(mapViewModel.Camera, -MOVEMENT_SENSITIVITY);
-                        break;
-                    case Key.W:
-                        LateralMove(mapViewModel.Camera, MOVEMENT_SENSITIVITY);
-                        break;
-                    case Key.Q:
-                        VerticalMove(mapViewModel.Camera, -MOVEMENT_SENSITIVITY);
-                        break;
-                    case Key.E:
-                        VerticalMove(mapViewModel.Camera, MOVEMENT_SENSITIVITY);
-                        break;
-                    case Key.Up:
-                        RotateAroundHorizontalAxis(mapViewModel.Camera, ROTATION_SENSITIVITY);
-                        break;
-                    case Key.Down:
-                        RotateAroundHorizontalAxis(mapViewModel.Camera, -ROTATION_SENSITIVITY);
-                        break;
-                    case Key.Right:
-                        RotateAroundVerticalAxis(mapViewModel.Camera, ROTATION_SENSITIVITY);
-                        break;
-                    case Key.Left:
-                        RotateAroundVerticalAxis(mapViewModel.Camera, -ROTATION_SENSITIVITY);
-                        break;
-                }
+                Camera camera = mapViewModel.Camera;
+                if (Keyboard.IsKeyDown(Key.A)) camera = HorizontalMove(camera, -MOVEMENT_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.D)) camera = HorizontalMove(camera, MOVEMENT_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.S)) camera = LateralMove(camera, -MOVEMENT_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.W)) camera = LateralMove(camera, MOVEMENT_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.Q)) camera = VerticalMove(camera, -MOVEMENT_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.E)) camera = VerticalMove(camera, MOVEMENT_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.Up)) camera = RotateAroundHorizontalAxis(camera, ROTATION_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.Down)) camera = RotateAroundHorizontalAxis(camera, -ROTATION_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.Right)) camera = RotateAroundVerticalAxis(camera, ROTATION_SENSITIVITY);
+                if (Keyboard.IsKeyDown(Key.Left)) camera = RotateAroundVerticalAxis(camera, -ROTATION_SENSITIVITY);
+                mapViewModel.Camera = camera;
                 keyEventArgs.Handled = true;
             }
             catch (InvalidCastException e)
@@ -91,10 +70,10 @@ namespace MapViewer.Wpf.Commands
         /// </summary>
         /// <param name="camera">Previous camera state.</param>
         /// <param name="amount">Distance to move.</param>
-        private void HorizontalMove(Camera camera, float amount)
+        private static Camera HorizontalMove(Camera camera, float amount)
         {
             Vector3 horizontalDirection = Vector3.Cross(camera.LookDirection, camera.UpDirection);
-            mapViewModel.Camera = new Camera(
+            return new Camera(
                     camera.Position + amount * horizontalDirection,
                     camera.LookDirection,
                     camera.UpDirection,
@@ -107,9 +86,9 @@ namespace MapViewer.Wpf.Commands
         /// </summary>
         /// <param name="camera">Previous camera state.</param>
         /// <param name="amount">Distance to move.</param>
-        private void VerticalMove(Camera camera, float amount)
+        private static Camera VerticalMove(Camera camera, float amount)
         {
-            mapViewModel.Camera = new Camera(
+            return new Camera(
                     camera.Position + amount * camera.UpDirection,
                     camera.LookDirection,
                     camera.UpDirection,
@@ -122,9 +101,9 @@ namespace MapViewer.Wpf.Commands
         /// </summary>
         /// <param name="camera">Previous camera state.</param>
         /// <param name="amount">Distance to move.</param>
-        private void LateralMove(Camera camera, float amount)
+        private static Camera LateralMove(Camera camera, float amount)
         {
-            mapViewModel.Camera = new Camera(
+            return new Camera(
                     camera.Position + amount * camera.LookDirection,
                     camera.LookDirection,
                     camera.UpDirection,
@@ -138,10 +117,10 @@ namespace MapViewer.Wpf.Commands
         /// </summary>
         /// <param name="camera">Previous camera state.</param>
         /// <param name="amount">Angle in degrees to rotate.</param>
-        private void RotateAroundHorizontalAxis(Camera camera, float amount)
+        private static Camera RotateAroundHorizontalAxis(Camera camera, float amount)
         {
             Vector3 axis = Vector3.Cross(camera.LookDirection, camera.UpDirection);
-            mapViewModel.Camera = new Camera(
+            return new Camera(
                     camera.Position,
                     RotateVectorAroundAxis(camera.LookDirection, axis, amount),
                     RotateVectorAroundAxis(camera.UpDirection, axis, amount),
@@ -155,9 +134,9 @@ namespace MapViewer.Wpf.Commands
         /// </summary>
         /// <param name="camera">Previous camera state.</param>
         /// <param name="amount">Angle in degrees to rotate.</param>
-        private void RotateAroundVerticalAxis(Camera camera, float amount)
+        private static Camera RotateAroundVerticalAxis(Camera camera, float amount)
         {   
-            mapViewModel.Camera = new Camera(
+            return new Camera(
                     camera.Position,
                     RotateVectorAroundAxis(camera.LookDirection, camera.UpDirection, amount),
                     camera.UpDirection,
