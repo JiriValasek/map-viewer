@@ -37,6 +37,21 @@ namespace MapViewer.Core.Models
         public float Altitude { get; }
 
         /// <summary>
+        /// Size of the center cross.
+        /// </summary>
+        public float CenterSize { get; }
+
+        /// <summary>
+        /// With of the circle line and center cross "lines".
+        /// </summary>
+        public float LineWidth { get; }
+
+        /// <summary>
+        /// Number of segments in the cross.
+        /// </summary>
+        public float SegmentCount { get; }
+
+        /// <summary>
         /// Model for a circle drawn on the map.
         /// </summary>
         /// <param name="center">Circle's center point.</param>
@@ -50,6 +65,9 @@ namespace MapViewer.Core.Models
             Center = center;
             Radius = radius;
             Altitude = altitude;
+            CenterSize = centerSize;
+            LineWidth = lineWidth;
+            SegmentCount = segmentCount;
             _circleMesh = GenerateCircleMesh(lineWidth, segmentCount);
             _centerMesh = GenerateCenterMesh(lineWidth, centerSize);
         }

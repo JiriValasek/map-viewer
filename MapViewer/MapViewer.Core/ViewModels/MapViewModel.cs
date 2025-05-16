@@ -176,11 +176,11 @@ namespace MapViewer.Core.ViewModels
         {
             _mapStore = mapStore;
             _settingsStore = settingsStore;
-            _settingsStore.CurrentSettingsChanged += OnCurrentSettingsChanged;
             HandleMouseCommand = handleMouseCommand(this);
             HandleKeyCommand = handleKeyCommand(this);
             MenuItems = [];
             SetupMenu(loadMapCommand(this), saveMapCommand(this), new NavigateCommand(navigateToSettings), new ResetViewCommand(this));
+            UpdateCircle();
         }
 
 
@@ -211,6 +211,24 @@ namespace MapViewer.Core.ViewModels
         }
 
         /// <summary>
+        /// Update Circle with new settings.
+        /// </summary>
+        private void UpdateCircle()
+        {
+            if (_settingsStore.Settings is not null && Circle is not null)
+            {
+                //TODO FIX sizes are not relative to zoom
+                Circle = new Circle(
+                    Circle.Center, 
+                    Circle.Radius, 
+                    Circle.Altitude, 
+                    Circle.CenterSize * _settingsStore.Settings.CenterSize / _settingsStore.PreviousSettings.CenterSize, 
+                    Circle.LineWidth * _settingsStore.Settings.LineWidth / _settingsStore.PreviousSettings.LineWidth, 
+                    _settingsStore.Settings.SegmentCount);
+            }
+        }
+
+        /// <summary>
         /// Setup hierarchical menu model.
         /// </summary>
         /// <param name="loadMapCommand">Command for loading a map from a file.</param>
@@ -234,18 +252,8 @@ namespace MapViewer.Core.ViewModels
             MenuItems.Add(viewMenu);
         }
 
-        private void OnCurrentSettingsChanged()
-        {
-            OnPropertyChanged(nameof(MinAltitudeColor));
-            OnPropertyChanged(nameof(MaxAltitudeColor));
-            OnPropertyChanged(nameof(CircleColor));
-            OnPropertyChanged(nameof(CenterColor));
-        }
 
 
-        public override void Dispose()
-        {
-            _settingsStore.CurrentSettingsChanged -= OnCurrentSettingsChanged;
-        }
+        public override void Dispose() { }
     }
 }
