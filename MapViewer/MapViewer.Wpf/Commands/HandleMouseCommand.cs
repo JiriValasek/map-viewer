@@ -2,14 +2,8 @@
 using MapViewer.Core.Models;
 using MapViewer.Core.ViewModels;
 using MapViewer.Wpf.EventArgs;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -96,13 +90,13 @@ namespace MapViewer.Wpf.Commands
         /// <param name="camera">Previous camera state.</param>
         private void PanMap(MapMouseEventArgs mapMouseEventArgs, Camera camera)
         {
-            if (mapMouseEventArgs.MouseEventArgs.RightButton == MouseButtonState.Pressed )
+            if (mapMouseEventArgs.MouseEventArgs.RightButton == MouseButtonState.Pressed)
             {
                 _lastPanPosition = _lastPanPosition.HasValue ? _lastPanPosition : GetMapSystemPoint(mapMouseEventArgs, camera);
                 Point newPosition = GetMapSystemPoint(mapMouseEventArgs, camera);
                 var movement = new Vector2((float)(newPosition.X - _lastPanPosition.Value.X), (float)(newPosition.Y - _lastPanPosition.Value.Y));
 
-                mapViewModel.Camera = new Camera( camera.Width, camera.Position.X - movement.X, camera.Position.Y - movement.Y, camera.Position.Z);
+                mapViewModel.Camera = new Camera(camera.Width, camera.Position.X - movement.X, camera.Position.Y - movement.Y, camera.Position.Z);
             }
             else if (mapMouseEventArgs.MouseEventArgs.RightButton == MouseButtonState.Released)
             {
@@ -132,10 +126,10 @@ namespace MapViewer.Wpf.Commands
                     camera.Position.Z);
                 // Update Circle to keep line width and center size
                 //TODO Move constans to config
-                mapViewModel.Circle = mapViewModel.Circle == null? null: new Circle(
-                    mapViewModel.Circle.Center, 
+                mapViewModel.Circle = mapViewModel.Circle == null ? null : new Circle(
+                    mapViewModel.Circle.Center,
                     mapViewModel.Circle.Radius,
-                    mapData.MaxAltitude,                    
+                    mapData.MaxAltitude,
                     (float)((5 / mapMouseEventArgs.MapWidth) * camera.Width),
                     (float)((3 / mapMouseEventArgs.MapWidth) * camera.Width),
                     100
@@ -152,7 +146,7 @@ namespace MapViewer.Wpf.Commands
         private void UpdateCursor(MapMouseEventArgs mapMouseEventArgs, Camera camera)
         {
             Point mapPoint = GetMapSystemPoint(mapMouseEventArgs, camera);
-            mapViewModel.UpdateCursor(new Vector2((float)mapPoint.X,(float)mapPoint.Y));
+            mapViewModel.UpdateCursor(new Vector2((float)mapPoint.X, (float)mapPoint.Y));
         }
 
         /// <summary>
@@ -163,7 +157,7 @@ namespace MapViewer.Wpf.Commands
         /// <returns>Cursor position in the camera space.</returns>
         private static Point GetMapSystemPoint(MapMouseEventArgs mapMouseEventArgs, Camera camera)
         {
-            Matrix cameraTransform = new( camera.Width, 0, 0, camera.Width / mapMouseEventArgs.AspectRatio, camera.Position.X, camera.Position.Y);
+            Matrix cameraTransform = new(camera.Width, 0, 0, camera.Width / mapMouseEventArgs.AspectRatio, camera.Position.X, camera.Position.Y);
             return mapMouseEventArgs.MapViewportPosition * cameraTransform;
         }
     }

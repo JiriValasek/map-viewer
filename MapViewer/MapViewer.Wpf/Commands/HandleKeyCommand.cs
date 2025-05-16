@@ -2,16 +2,9 @@
 using MapViewer.Core.Models;
 using MapViewer.Core.Stores;
 using MapViewer.Core.ViewModels;
-using MapViewer.Wpf.EventArgs;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace MapViewer.Wpf.Commands
 {
@@ -37,7 +30,7 @@ namespace MapViewer.Wpf.Commands
                 KeyEventArgs keyEventArgs = (KeyEventArgs)parameter;
                 switch (keyEventArgs.Key)
                 {
-                    case Key.A: 
+                    case Key.A:
                         HorizontalMove(mapViewModel.Camera, -settingsStore.Settings.MovementStep);
                         break;
                     case Key.D:
@@ -147,7 +140,7 @@ namespace MapViewer.Wpf.Commands
         /// <param name="camera">Previous camera state.</param>
         /// <param name="amount">Angle in degrees to rotate.</param>
         private void RotateAroundVerticalAxis(Camera camera, float amount)
-        {   
+        {
             mapViewModel.Camera = new Camera(
                     camera.Position,
                     RotateVectorAroundAxis(camera.LookDirection, camera.UpDirection, amount),
@@ -169,8 +162,8 @@ namespace MapViewer.Wpf.Commands
             // Rodrigues' rotation formula
             Vector3 vXa = Vector3.Cross(axis, vector);
             Vector3 vXvXa = Vector3.Cross(axis, vXa);
-            return vector 
-                + (float)(Math.Sin(angle * Math.PI / 180)) * vXa 
+            return vector
+                + (float)(Math.Sin(angle * Math.PI / 180)) * vXa
                 + (float)(1 - Math.Cos(angle * Math.PI / 180)) * vXvXa;
         }
 

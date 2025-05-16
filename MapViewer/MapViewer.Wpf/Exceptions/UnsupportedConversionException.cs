@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MapViewer.Wpf.Exceptions
+﻿namespace MapViewer.Wpf.Exceptions
 {
     /// <summary>
     /// Represents errors that occur when converted does not support target type.

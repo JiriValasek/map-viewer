@@ -1,17 +1,9 @@
 ﻿using MapViewer.Core.Commands;
-using MapViewer.Core.ViewModels;
-using MapViewer.Core.Models;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MapViewer.Core.Utils;
 using MapViewer.Core.Exceptions;
-using System.Runtime.CompilerServices;
-using System.Timers;
-using System.Windows;
-using System.Diagnostics;
+using MapViewer.Core.Models;
+using MapViewer.Core.Utils;
+using MapViewer.Core.ViewModels;
+using Microsoft.Win32;
 using System.Windows.Threading;
 
 namespace MapViewer.Wpf.Commands
@@ -28,7 +20,7 @@ namespace MapViewer.Wpf.Commands
         /// Modulus for <see cref="_dotCounter"/>.
         /// </summary>
         private readonly int MAX_DOT_COUNT_MODULUS = 4;
-        
+
         /// <summary>
         /// Default text to show while loading.
         /// </summary>
@@ -49,7 +41,8 @@ namespace MapViewer.Wpf.Commands
 
         public override async Task ExecuteAsync(object? parameter)
         {
-            OpenFileDialog openDialog = new() { 
+            OpenFileDialog openDialog = new()
+            {
                 Filter = null,
                 RestoreDirectory = true,
                 Multiselect = false,
@@ -67,10 +60,11 @@ namespace MapViewer.Wpf.Commands
                 try
                 {
                     MapData mapData = await Dispatcher.CurrentDispatcher.Invoke(
-                        async () => {
+                        async () =>
+                        {
                             return await MapFileUtils.LoadMapAsync(openDialog.FileName);
                         },
-                        DispatcherPriority.Background); 
+                        DispatcherPriority.Background);
                     mapViewModel.Map = new Map(mapData);
                     HideLoadingText();
                 }
@@ -79,7 +73,7 @@ namespace MapViewer.Wpf.Commands
                     ShowError(e);
                 }
 
-            }   
+            }
         }
 
         /// <summary>

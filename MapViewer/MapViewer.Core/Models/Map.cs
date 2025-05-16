@@ -1,13 +1,4 @@
-﻿using MapViewer.Core.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace MapViewer.Core.Models
 {
@@ -26,7 +17,8 @@ namespace MapViewer.Core.Models
         /// <summary>
         /// Mesh for rendering a map based on <see cref="Data"/>.
         /// </summary>
-        public Mesh MapMesh {
+        public Mesh MapMesh
+        {
             get => _mapMesh;
         }
 
@@ -56,7 +48,7 @@ namespace MapViewer.Core.Models
                 textureCoords,
                 triangleIndices
                 );
-            
+
         }
 
         /// <summary>
@@ -70,7 +62,7 @@ namespace MapViewer.Core.Models
             {
                 for (int j = 0; j < Data.Altitude.GetLength(1); j++)
                 {
-                    positions.Add( new Vector3(
+                    positions.Add(new Vector3(
                         ColumnToXCoordinate(j),
                         RowToYCoordinate(i),
                         Data.Altitude[i, j]));
@@ -132,9 +124,9 @@ namespace MapViewer.Core.Models
         {
             List<int> indices = [];
             IEnumerable<int> square;
-            for (int i = 0; i < Data.Altitude.GetLength(0)-1; i++)
+            for (int i = 0; i < Data.Altitude.GetLength(0) - 1; i++)
             {
-                for (int j = 0; j < Data.Altitude.GetLength(1)-1; j++)
+                for (int j = 0; j < Data.Altitude.GetLength(1) - 1; j++)
                 {
                     square = CoordinateTo2TriangleIndices(i, j);
                     indices.AddRange(square);
@@ -150,7 +142,7 @@ namespace MapViewer.Core.Models
         /// <returns>Y coordinate</returns>
         private float RowToYCoordinate(int row)
         {
-            return Data.YLLCorner + 
+            return Data.YLLCorner +
                 (Data.RowCount - 1 - row) * Data.CellSize;
         }
 
@@ -173,10 +165,11 @@ namespace MapViewer.Core.Models
         /// <returns>Texture coordinate for both X and Y axis.</returns>
         private float AltitudeToTextureCoordinate(int altitude)
         {
-            try { 
+            try
+            {
                 return (Convert.ToSingle(altitude) - Data.MinAltitude) / (Data.MaxAltitude - Data.MinAltitude);
-            } 
-            catch(DivideByZeroException)
+            }
+            catch (DivideByZeroException)
             {
                 return 0;
             }
@@ -211,7 +204,7 @@ namespace MapViewer.Core.Models
                 triangle2index2,
                 triangle2index3
                 ];
-            
+
         }
 
     }

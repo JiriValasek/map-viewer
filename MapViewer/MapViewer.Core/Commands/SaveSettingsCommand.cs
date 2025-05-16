@@ -1,12 +1,7 @@
-﻿using MapViewer.Core.Services;
+﻿using MapViewer.Core.Models;
+using MapViewer.Core.Services;
 using MapViewer.Core.Stores;
-using MapViewer.Core.Models;
 using MapViewer.Core.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 
 namespace MapViewer.Core.Commands
@@ -27,7 +22,7 @@ namespace MapViewer.Core.Commands
 
         public override bool CanExecute(object? parameter)
         {
-           return _settingsViewModel.CanSave && base.CanExecute(parameter);
+            return _settingsViewModel.CanSave && base.CanExecute(parameter);
         }
 
         public override void Execute(object? parameter)

@@ -1,11 +1,6 @@
 ﻿using MapViewer.Core.Models;
 using MapViewer.Core.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MapViewer.Core.Commands
 {
@@ -32,7 +27,7 @@ namespace MapViewer.Core.Commands
 
         public override void Execute(object? parameter)
         {
-            if (_mapViewModel.Camera is not null &&  _mapViewModel.Map is not null)
+            if (_mapViewModel.Camera is not null && _mapViewModel.Map is not null)
             {
                 _mapViewModel.Camera = new Camera(
                     _mapViewModel.Map.Data.Width,

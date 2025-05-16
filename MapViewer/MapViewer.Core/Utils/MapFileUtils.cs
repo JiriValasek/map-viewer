@@ -1,13 +1,9 @@
 ﻿using MapViewer.Core.Exceptions;
 using MapViewer.Core.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MapViewer.Core.Utils
 {
@@ -43,9 +39,9 @@ namespace MapViewer.Core.Utils
                 Match match = COLUMN_COUNT_REGEX.Match(line);
                 if (!match.Success)
                 {
-                    throw new MapFileException(String.Format("Column count parsing failed, it should match {0}.",COLUMN_COUNT_REGEX), 1);
+                    throw new MapFileException(String.Format("Column count parsing failed, it should match {0}.", COLUMN_COUNT_REGEX), 1);
                 }
-                if (! Int32.TryParse(match.Groups["value"].Value, out Int32 columnCount))
+                if (!Int32.TryParse(match.Groups["value"].Value, out Int32 columnCount))
                 {
                     throw new MapFileException("Unable to parse column count as a 32-bit integer.", 1);
                 }

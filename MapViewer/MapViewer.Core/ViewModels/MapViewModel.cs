@@ -1,18 +1,12 @@
-﻿using MapViewer.Core.Stores;
-using MapViewer.Core.Commands;
+﻿using MapViewer.Core.Commands;
 using MapViewer.Core.Exceptions;
 using MapViewer.Core.Models;
 using MapViewer.Core.Services;
-using System;
-using System.Collections.Generic;
+using MapViewer.Core.Stores;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MapViewer.Core.ViewModels
@@ -50,7 +44,7 @@ namespace MapViewer.Core.ViewModels
                         value.Data.XCenter,
                         value.Data.YCenter,
                         value.Data.MaxAltitude);
-                } 
+                }
                 else
                 {
                     Camera = null;
@@ -100,7 +94,8 @@ namespace MapViewer.Core.ViewModels
         /// <summary>
         /// Camera model for rendering.
         /// </summary>
-        public Camera? Camera {
+        public Camera? Camera
+        {
             get => _mapStore.Camera;
             set
             {
@@ -112,18 +107,19 @@ namespace MapViewer.Core.ViewModels
         /// <summary>
         /// Cursor position to be displayed on the status panel.
         /// </summary>
-        public Vector3? Cursor { 
-            get => _cursor; 
+        public Vector3? Cursor
+        {
+            get => _cursor;
             private set
-            { 
+            {
                 _cursor = value;
                 OnPropertyChanged(nameof(Cursor));
-            } 
+            }
         }
 
         public Color MinAltitudeColor
         {
-            get 
+            get
             {
                 return _settingsStore.Settings.MinAltitudeColor;
             }
@@ -173,7 +169,7 @@ namespace MapViewer.Core.ViewModels
             MapStore mapStore,
             SettingsStore settingsStore,
             NavigationService navigateToSettings,
-            Func<MapViewModel, ICommand> loadMapCommand, 
+            Func<MapViewModel, ICommand> loadMapCommand,
             Func<MapViewModel, ICommand> saveMapCommand,
             Func<MapViewModel, ICommand> handleMouseCommand,
             Func<MapViewModel, ICommand> handleKeyCommand)
@@ -200,7 +196,7 @@ namespace MapViewer.Core.ViewModels
             {
                 Cursor = new Vector3(cursor.X, cursor.Y, Map.Data.GetAltitude(cursor));
                 return true;
-            } 
+            }
             catch (MapCoordinatesException e)
             {
                 Debug.WriteLine("Cursor update failed - cursor out outside of the map.");
@@ -247,7 +243,8 @@ namespace MapViewer.Core.ViewModels
         }
 
 
-        public override void Dispose() {
+        public override void Dispose()
+        {
             _settingsStore.CurrentSettingsChanged -= OnCurrentSettingsChanged;
         }
     }

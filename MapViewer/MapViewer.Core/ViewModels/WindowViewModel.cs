@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MapViewer.Core.ViewModels
+﻿namespace MapViewer.Core.ViewModels
 {
     public abstract class WindowViewModel : BaseViewModel, IDisposable
     {

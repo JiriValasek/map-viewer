@@ -1,10 +1,5 @@
 ﻿using MapViewer.Core.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MapViewer.Core.Models
 {
@@ -70,11 +65,11 @@ namespace MapViewer.Core.Models
         /// Width of the map.
         /// </summary>
         public float Width
-        { 
+        {
             get
             {
                 return CellSize * (ColumnCount - 1);
-            } 
+            }
         }
 
         /// <summary>
@@ -111,7 +106,7 @@ namespace MapViewer.Core.Models
             {
                 throw new MapCoordinatesException("X coordinate must be greater than XLLCorner.", coords);
             }
-            if (coords.X > (XLLCorner + CellSize*ColumnCount))
+            if (coords.X > (XLLCorner + CellSize * ColumnCount))
             {
                 throw new MapCoordinatesException("X coordinate must be less then XLLCorner + CellSize * ColumnCount.", coords);
             }
@@ -145,10 +140,10 @@ namespace MapViewer.Core.Models
             float y2 = (float)(indY2 * CellSize);
             // Prepare transformation matrix
             Matrix4x4 transform = Matrix4x4.Transpose(new Matrix4x4(
-                x2*y2, -x2*y1, -x1*y2, x1*y1,
-                  -y2,     y1,     y2,   -y1,
-                  -x2,     x2,     x1,   -x1,
-                    1,     -1,     -1,     1
+                x2 * y2, -x2 * y1, -x1 * y2, x1 * y1,
+                  -y2, y1, y2, -y1,
+                  -x2, x2, x1, -x1,
+                    1, -1, -1, 1
                 ));
             // Retrieve altitudes to be interpolated
             Vector4 interpolatedValues = new(

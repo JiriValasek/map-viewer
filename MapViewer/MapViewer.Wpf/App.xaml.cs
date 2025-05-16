@@ -1,10 +1,10 @@
 ﻿using MapViewer.Core.Models;
-using System.Drawing;
-using System.Windows;
+using MapViewer.Core.Services;
+using MapViewer.Core.Stores;
 using MapViewer.Core.ViewModels;
 using MapViewer.Wpf.Commands;
-using MapViewer.Core.Stores;
-using MapViewer.Core.Services;
+using System.Drawing;
+using System.Windows;
 
 namespace MapViewer.Wpf;
 

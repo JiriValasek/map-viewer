@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
 
 namespace MapViewer.Core.Models
 {
@@ -14,7 +9,7 @@ namespace MapViewer.Core.Models
     /// <param name="normals">Vertex normals for MeshGeometry3D.</param>
     /// <param name="textureCoordinates">Vertex texture coordinates for MeshGeometry3D.</param>
     /// <param name="triangleIndices">Triangle indices for MeshGeometry3D.</param>
-    public class Mesh (IEnumerable<Vector3> positions, IEnumerable<Vector3> normals, IEnumerable<Vector2> textureCoordinates, IEnumerable<int> triangleIndices)
+    public class Mesh(IEnumerable<Vector3> positions, IEnumerable<Vector3> normals, IEnumerable<Vector2> textureCoordinates, IEnumerable<int> triangleIndices)
     {
         /// <summary>
         /// Vertex positions for MeshGeometry3D.

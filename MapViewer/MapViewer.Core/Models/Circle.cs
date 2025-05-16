@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using System.Numerics;
 
 namespace MapViewer.Core.Models
 {
@@ -20,7 +14,7 @@ namespace MapViewer.Core.Models
         /// Circle's center point.
         /// </summary>
         public Vector2 Center { get; }
-        
+
         /// <summary>
         /// Circle's radius.
         /// </summary>
@@ -51,7 +45,7 @@ namespace MapViewer.Core.Models
         /// <param name="centerSize">Width and heigh of the mesh for rendering cicle's center in map units.</param>
         /// <param name="lineWidth">Width of circle's and center's lines in map units.</param>
         /// <param name="segmentCount">Number of line segments to use for rendering the circle.</param>
-        public Circle(Vector2 center, float radius, float altitude, float centerSize, float lineWidth, int segmentCount )
+        public Circle(Vector2 center, float radius, float altitude, float centerSize, float lineWidth, int segmentCount)
         {
             Center = center;
             Radius = radius;
@@ -181,7 +175,7 @@ namespace MapViewer.Core.Models
         private List<Vector3> GenerateCenterMeshPositions(float lineWidth, float centerSize)
         {
             List<Vector3> positions = [];
-            positions.Add(new Vector3(Center.X, Center.Y, Altitude ));
+            positions.Add(new Vector3(Center.X, Center.Y, Altitude));
             positions.Add(new Vector3(Center.X + centerSize, Center.Y - (lineWidth / 2), Altitude));
             positions.Add(new Vector3(Center.X + centerSize, Center.Y + (lineWidth / 2), Altitude));
             positions.Add(new Vector3(Center.X - centerSize, Center.Y + (lineWidth / 2), Altitude));

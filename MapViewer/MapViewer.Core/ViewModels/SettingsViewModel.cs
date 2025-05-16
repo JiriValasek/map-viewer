@@ -2,15 +2,10 @@
 using MapViewer.Core.Models;
 using MapViewer.Core.Services;
 using MapViewer.Core.Stores;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace MapViewer.Core.ViewModels
@@ -23,7 +18,7 @@ namespace MapViewer.Core.ViewModels
 
         private readonly SettingsStore _settingsStore;
         private readonly Dictionary<string, List<string>> _propertyNameToErrorsDictionary;
-        private string _minAltitudeColor, _maxAltitudeColor, _circleColor, _centerColor, _lineWidth, 
+        private string _minAltitudeColor, _maxAltitudeColor, _circleColor, _centerColor, _lineWidth,
             _centerSize, _segmentCount, _zoomSensitivity, _rotationStep, _movementStep;
         private bool _isSaving;
 
@@ -35,9 +30,9 @@ namespace MapViewer.Core.ViewModels
         public Settings Settings { get => _settingsStore.Settings; }
 
         // Map settings
-        public string MinAltitudeColor 
+        public string MinAltitudeColor
         {
-            get => _minAltitudeColor; 
+            get => _minAltitudeColor;
             set
             {
                 _minAltitudeColor = value;
@@ -48,7 +43,7 @@ namespace MapViewer.Core.ViewModels
         public Color MinAltitudeColorForeground { get; set; }
         public Color MinAltitudeColorBackground { get; set; }
 
-        public string MaxAltitudeColor 
+        public string MaxAltitudeColor
         {
             get => _maxAltitudeColor;
             set
@@ -89,7 +84,7 @@ namespace MapViewer.Core.ViewModels
         public Color CenterColorForeground { get; set; }
         public Color CenterColorBackground { get; set; }
 
-        public string LineWidth 
+        public string LineWidth
         {
             get => _lineWidth;
             set
@@ -99,7 +94,7 @@ namespace MapViewer.Core.ViewModels
                 CheckFloat(nameof(LineWidth));
             }
         }
-        public string CenterSize 
+        public string CenterSize
         {
             get => _centerSize;
             set
@@ -109,7 +104,7 @@ namespace MapViewer.Core.ViewModels
                 CheckFloat(nameof(CenterSize));
             }
         }
-        public string SegmentCount 
+        public string SegmentCount
         {
             get => _segmentCount;
             set
@@ -121,7 +116,7 @@ namespace MapViewer.Core.ViewModels
         }
 
         // Controls settings
-        public string ZoomSensitivity 
+        public string ZoomSensitivity
         {
             get => _zoomSensitivity;
             set
@@ -131,7 +126,7 @@ namespace MapViewer.Core.ViewModels
                 CheckFloat(nameof(ZoomSensitivity));
             }
         }
-        public string RotationStep 
+        public string RotationStep
         {
             get => _rotationStep;
             set
@@ -141,7 +136,7 @@ namespace MapViewer.Core.ViewModels
                 CheckFloat(nameof(RotationStep));
             }
         }
-        public string MovementStep 
+        public string MovementStep
         {
             get => _movementStep;
             set
@@ -178,7 +173,7 @@ namespace MapViewer.Core.ViewModels
 
         // TOOD Language??
 
-        public SettingsViewModel(SettingsStore settingsStore, NavigationService navigateToMap) 
+        public SettingsViewModel(SettingsStore settingsStore, NavigationService navigateToMap)
         {
             _settingsStore = settingsStore;
             _minAltitudeColor = Settings.MinAltitudeColor.Name;
@@ -207,7 +202,7 @@ namespace MapViewer.Core.ViewModels
 
         public IEnumerable GetErrors(string? propertyName)
         {
-            return String.IsNullOrWhiteSpace(propertyName) ? [] : _propertyNameToErrorsDictionary.GetValueOrDefault(propertyName, []) ;
+            return String.IsNullOrWhiteSpace(propertyName) ? [] : _propertyNameToErrorsDictionary.GetValueOrDefault(propertyName, []);
         }
 
         private void CheckColor(string propertyName)
@@ -224,7 +219,7 @@ namespace MapViewer.Core.ViewModels
 
             try
             {
-                int a,r,g,b;
+                int a, r, g, b;
                 switch (colorString.Length)
                 {
                     case 3:
@@ -264,7 +259,7 @@ namespace MapViewer.Core.ViewModels
                 OnPropertyChanged(nameof(CanSave));
                 return;
             }
-            catch (Exception e) { }
+            catch { }
             ShowColors(propertyName, null);
             AddError("Unknown color - use name starting with a capital letter or an ARGB hexadecimal value.", propertyName);
             OnPropertyChanged(nameof(CanSave));
@@ -277,7 +272,7 @@ namespace MapViewer.Core.ViewModels
             try
             {
                 Single.Parse(floatString);
-            } 
+            }
             catch
             {
                 AddError("String must be a valid real number.", propertyName);
@@ -351,6 +346,6 @@ namespace MapViewer.Core.ViewModels
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        public override void Dispose(){}
+        public override void Dispose() { }
     }
 }

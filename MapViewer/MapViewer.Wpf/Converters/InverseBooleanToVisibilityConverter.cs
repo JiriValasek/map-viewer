@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
+﻿using System.Globalization;
 using System.Windows;
-using System.Numerics;
-using System.Windows.Media.Media3D;
-using MapViewer.Wpf.Exceptions;
+using System.Windows.Data;
 
 namespace MapViewer.Wpf.Converters
 {
